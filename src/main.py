@@ -2,7 +2,7 @@ from aiosmsactivate import SmsActivate
 
 import asyncio
 
-sa = SmsActivate('e4c4d0265e4d9849cfAc39ce10dcc0b6')
+sa = SmsActivate('token')
 
 async def main():
     balance = await sa.get_balance()

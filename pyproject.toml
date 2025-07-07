@@ -7,10 +7,10 @@ packages = ["src/aiosmsactivate"]
 
 [project]
 name = "aiosmsactivate"
-version = "1.0.0"
+version = "0.0.1"
 description = "Python asyncio wrapper for sms-activate.io API"
 readme = "README.md"
-authors = [{ name = "kewldan", email = "kewldanil1@gmail.com" }, { name = "lolkof", email = "kewldanil1@gmail.com" }]
+authors = [{ name = "kewldan", email = "kewldanil1@gmail.com" }, { name = "lolkof", email = "lolkofprog@gmail.com" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -25,3 +25,5 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/AioSmsProviders/aiosmsactivate"
+Documentation = "https://aiosmsproviders.github.io/aiosmsactivate/aiosmsactivate/client.html"
+Issues = "https://github.com/AioSmsProviders/aiosmsactivate/issues"
