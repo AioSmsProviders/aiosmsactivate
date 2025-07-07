@@ -25,13 +25,23 @@ allowed_domains = [
 class SmsActivate:
     """
     RU  
-    Спасибо за использование моей библиотеки, вы можете принять участие в развитии библиотеки
+    Спасибо за использование моей библиотеки, вы можете принять участие в развитии библиотеки  
+      
+    ВАЖНО
+    библиотека полностью поддерживает все методы с оффициальной документации
+    https://sms-activate.page/api2 на момент 08.07.2025  
+      
     на git: https://github.com/AioSmsProviders/aiosmsactivate
     Так же можете писать в чат https://t.me/+5YQ8k6H02bkxZmRi
     или обратиться к главному разработчику с идеями, предложениями и багами: https://t.me/lolkof  
     
     EN  
-    Thank you for using my library, you can participate in the development of the library
+    Thank you for using my library, you can participate in the development of the library.  
+      
+    important
+    The library fully supports all methods from the official documentation
+    https://sms-activate.page/api2 as of 07/08/2025  
+      
     on git: https://github.com/AioSmsProviders/aiosmsactivate
     You can also write to the chat https://t.me/+5YQ8k6H02bkxZmRi
     or contact the main developer with ideas, suggestions, and bugs: https://t.me/lolkof
@@ -94,10 +104,8 @@ class SmsActivate:
             raise SmsActivateException('Invalid response sequence')
 
         return float(match.group(1))
-    getBalance = get_balance
     async def get_balance_and_cashback(self):
         return await self.get_balance(cashback=True)
-    getBalanceAndCashBack = get_balance_and_cashback
 
     async def get_available_countries(self, service: str, freePrice: bool | str) -> dict[str, ...]:
         response = await self.__send_request('getTopCountriesByService', params={
@@ -109,7 +117,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getTopCountriesByService = get_available_countries
     
     async def get_count_numbers(self, country: str, operator: str) -> dict[str, ...]:
         response = await self.__send_request('getNumbersStatus', params={
@@ -121,7 +128,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getNumbersStatus = get_count_numbers
     
     async def get_operators(self, country: str = None) -> dict[str, ...]:
         params = {}
@@ -133,7 +139,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getOperators = get_operators
     
     async def get_active_activations(self) -> dict[str, ...]:
         response = await self.__send_request('getActiveActivations')
@@ -142,7 +147,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getActiveActivations = get_active_activations
 
     async def get_activation_status_v1(self, id: str) -> tuple[ActivationStatus, str | None]:
         response = await self.__send_request('getStatus', params={
@@ -164,7 +168,6 @@ class SmsActivate:
                 return ActivationStatus.OK, data[1]
             case _:
                 raise SmsActivateException('Invalid response sequence')
-    getStatus = get_activation_status_v1
     
     async def get_activation_status(self, id: str) -> tuple[ActivationStatus, str | None] | dict:
         response = await self.__send_request('getStatusV2', params={
@@ -175,7 +178,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getStatusV2 = get_activation_status
 
     async def purchase(self, service: str, forward: bool | None = None, maxPrice: float | None = None,
                        phoneException: str | None = None, operator: str | None = None,
@@ -205,12 +207,10 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getNumberV2 = purchase
     
-    async def getNumber(self, *args, **kwargs):
+    async def get_number(self, *args, **kwargs):
         kwargs["_is_v2"] = False
         return await self.purchase(*args, **kwargs)
-    purchase_v1 = getNumber
     
     async def get_multi_service_number(self, 
                         multiService: str, multiForward: str | None = None,
@@ -236,7 +236,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getMultiServiceNumber = get_multi_service_number
     
 
     async def set_activation_status(self, id: str, status: SetActivationStatus,
@@ -250,7 +249,6 @@ class SmsActivate:
         })
 
         return members[response]
-    setStatus = set_activation_status
 
     async def get_history(self, 
                           start: str | int = None,
@@ -269,7 +267,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getHistory = get_history
     
     async def get_list_top_countries(self, 
                           service: str,
@@ -282,7 +279,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getListOfTopCountriesByService = get_list_top_countries
     
     async def get_incoming_call_status(self, 
                           id: str | int = None,
@@ -295,7 +291,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getIncomingCallStatus = get_incoming_call_status
     
     async def get_prices(self, 
                           service: str = None,
@@ -310,7 +305,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getPrices = get_prices
     
     async def get_prices_verification(self, 
                           service: str = None,
@@ -323,7 +317,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getPricesVerification = get_prices_verification
     
     async def get_countries(self,
                        ) -> dict | list:
@@ -334,7 +327,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getCountries = get_countries
     
     async def get_service_list(self, 
                           country: str = None,
@@ -349,7 +341,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getServicesList = get_service_list
     
     async def get_additional_service(self, 
                           service: str = None,
@@ -372,7 +363,6 @@ class SmsActivate:
             return data[1], data[2]
         
         return data
-    getAdditionalService = get_additional_service
     
     async def get_extra_activation(self, 
                           id: str = None,
@@ -392,7 +382,6 @@ class SmsActivate:
             return data[1], data[2]
         
         return data
-    getExtraActivation = get_extra_activation
     
     async def check_extra_activation(self, 
                           activationId: str | int
@@ -405,7 +394,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    checkExtraActivation = check_extra_activation
     
     async def parse_call(self, 
                           id: str | int,
@@ -420,7 +408,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    parseCall = parse_call
     
     # !!! BOTTOM IT IS RENT API
     async def get_rent_services_and_countries(self,
@@ -442,7 +429,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getRentServicesAndCountries = get_rent_services_and_countries
     
     async def get_rent_number(self,
                         service: str,
@@ -465,7 +451,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getRentNumber = get_rent_number
     
     async def get_rent_status(self,
                         id: str,
@@ -482,7 +467,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getRentStatus = get_rent_status
     
     async def set_rent_status(self,
                         id: str,
@@ -497,7 +481,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getRentStatus = get_rent_status
     
     async def get_rent_list(self,
                        ) -> dict | str:
@@ -508,7 +491,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getRentList = get_rent_list
     
     async def continue_rent_number(self,
                         id: str,
@@ -523,7 +505,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    continueRentNumber = continue_rent_number
     
     async def get_continue_rent_price_number(self,
                         id: str,
@@ -540,7 +521,6 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    getContinueRentPriceNumber = get_continue_rent_price_number
     
     # !!! BOTTOM IS IT PARTNER SOFT API
     async def buy_partner_product(self,
@@ -554,5 +534,38 @@ class SmsActivate:
             return response
         
         return json.loads(response)
-    buyPartnerProduct = buy_partner_product
     
+
+# === Method Aliases (outside class for pdoc) ===
+SmsActivate.getBalance = SmsActivate.get_balance
+SmsActivate.getBalanceAndCashBack = SmsActivate.get_balance_and_cashback
+SmsActivate.getTopCountriesByService = SmsActivate.get_available_countries
+SmsActivate.getNumbersStatus = SmsActivate.get_count_numbers
+SmsActivate.getOperators = SmsActivate.get_operators
+SmsActivate.getActiveActivations = SmsActivate.get_active_activations
+SmsActivate.getStatus = SmsActivate.get_activation_status_v1
+SmsActivate.getStatusV2 = SmsActivate.get_activation_status
+SmsActivate.getNumberV2 = SmsActivate.purchase
+SmsActivate.purchase_v1 = SmsActivate.get_number
+SmsActivate.getNumber = SmsActivate.get_number
+SmsActivate.getMultiServiceNumber = SmsActivate.get_multi_service_number
+SmsActivate.setStatus = SmsActivate.set_activation_status
+SmsActivate.getHistory = SmsActivate.get_history
+SmsActivate.getListOfTopCountriesByService = SmsActivate.get_list_top_countries
+SmsActivate.getIncomingCallStatus = SmsActivate.get_incoming_call_status
+SmsActivate.getPrices = SmsActivate.get_prices
+SmsActivate.getPricesVerification = SmsActivate.get_prices_verification
+SmsActivate.getCountries = SmsActivate.get_countries
+SmsActivate.getServicesList = SmsActivate.get_service_list
+SmsActivate.getAdditionalService = SmsActivate.get_additional_service
+SmsActivate.getExtraActivation = SmsActivate.get_extra_activation
+SmsActivate.checkExtraActivation = SmsActivate.check_extra_activation
+SmsActivate.parseCall = SmsActivate.parse_call
+SmsActivate.getRentServicesAndCountries = SmsActivate.get_rent_services_and_countries
+SmsActivate.getRentNumber = SmsActivate.get_rent_number
+SmsActivate.getRentStatus = SmsActivate.get_rent_status
+SmsActivate.getRentStatus = SmsActivate.get_rent_status
+SmsActivate.getRentList = SmsActivate.get_rent_list
+SmsActivate.continueRentNumber = SmsActivate.continue_rent_number
+SmsActivate.getContinueRentPriceNumber = SmsActivate.get_continue_rent_price_number
+SmsActivate.buyPartnerProduct = SmsActivate.buy_partner_product
