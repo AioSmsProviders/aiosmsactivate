@@ -69,7 +69,6 @@ class SmsActivate:
             **({'maxPrice': str(max_price)} if max_price is not None else {}),
             **({'phoneException': phone_exception} if phone_exception is not None else {}),
             **({'operator': operator} if operator is not None else {}),
-            **({'verification': str(verification)} if verification is not None else {}),
             **({'ref': ref} if ref is not None else {}),
             **({'country ': country} if country is not None else {}),
             **({'useCashBack': str(use_cashback)} if use_cashback is not None else {}),
