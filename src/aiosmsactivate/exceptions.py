@@ -55,7 +55,8 @@ api_errors = {
 
 
 class SmsActivateException(Exception):
-    def __init__(self, message: str):
+    def __init__(self, code, message: str):
+        self.code = code
         self.message = message
 
 
@@ -70,5 +71,5 @@ def raise_smsactivate_error(response_text: str):
     error_message = error_response_text
     
     if error_code in api_errors.keys():
-        raise SmsActivateException(f'{error_message} - {api_errors[error_code]}')
+        raise SmsActivateException(error_code, f'{error_message} - {api_errors[error_code]}')
     

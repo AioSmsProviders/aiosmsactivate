@@ -4,7 +4,7 @@
 
 [![AioSmsProviders - aiosmsactivate](https://img.shields.io/static/v1?label=AioSmsProviders&message=AIOSMSACTIVATE&color=blue&logo=github)](https://github.com/AioSmsProviders/aiosmsactivate "Go to GitHub repo")
 
-[SMS-ACTIVATE Official documentation](https://sms-activate.page/api2)
+[SMS-ACTIVATE Official documentation](https://sms-activate.page/api2?ref=1707310)
 
 [ДОКУМЕНТАЦИЯ](https://aiosmsproviders.github.io/aiosmsactivate/aiosmsactivate/client.html)
 [DOCUMENTATION](https://aiosmsproviders.github.io/aiosmsactivate/aiosmsactivate/client.html)
