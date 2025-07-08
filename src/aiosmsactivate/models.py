@@ -7,6 +7,14 @@ from pydantic import BaseModel, Field, field_validator
 
 from aiosmsactivate.types import SetActivationStatus
 
+not_standart_activate_times = {
+    'ya':60*40,
+    'ft':60*60,
+    'ig':60*60,
+    'cy':60*60,
+    'wx':60*60,
+}
+
 class Sms(BaseModel):
     date_time: str = Field(alias='dateTime')
     code: str = Field(alias='code')
@@ -40,14 +48,19 @@ class Number(BaseModel):
     can_get_another_sms: bool = Field(alias='canGetAnotherSms')
     activation_time: str = Field(alias='activationTime')
     operator: str = Field(alias='activationOperator')
+    service: str
     activation_unix_time: float | None = None
+    time_life: float | None = None
+    end_activation_time: float | None = None
     
     _smsactivate_instance: Any = None
     
     def model_post_init(self, __context):
-        dt = datetime.datetime.strptime("2022-06-01 17:30:57", "%Y-%m-%d %H:%M:%S")
+        dt = datetime.datetime.strptime(self.activation_time, "%Y-%m-%d %H:%M:%S")
         timestamp = time.mktime(dt.timetuple())
         self.activation_unix_time = int(timestamp)
+        self.time_life = 60*20 if self.service not in not_standart_activate_times.keys() else not_standart_activate_times[self.service]
+        self.end_activation_time = int(timestamp) + self.time_life
     
     @classmethod
     def from_response(cls, smsactivate_instance, data: dict):

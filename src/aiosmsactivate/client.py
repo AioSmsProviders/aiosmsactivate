@@ -290,7 +290,9 @@ class SmsActivate:
         if not is_json(response):
             return response
         
-        return Number.from_response(self, json.loads(response))
+        data = json.loads(response)
+        data['service'] = service
+        return Number.from_response(self, data)
     
     async def get_number(self, *args, **kwargs):
         kwargs["_is_v2"] = False

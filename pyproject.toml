@@ -7,7 +7,7 @@ packages = ["src/aiosmsactivate"]
 
 [project]
 name = "aiosmsactivate"
-version = "1.4.1"
+version = "1.4.2"
 description = "Python asyncio wrapper for sms-activate.io API"
 readme = "README.md"
 authors = [{ name = "lolkof", email = "lolkofprog@gmail.com" }, { name = "kewldan", email = "kewldanil1@gmail.com" }]
