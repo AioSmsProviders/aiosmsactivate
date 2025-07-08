@@ -8,7 +8,7 @@ from typing import Literal
 import aiohttp
 
 from .utils import is_json
-from .exceptions import SmsActivateException
+from .exceptions import SmsActivateException, raise_smsactivate_error
 from .models import ActivationData, Number, SetActivationStatusResponse, Sms
 from .types import SetActivationStatus, ActivationStatus
 
@@ -122,8 +122,10 @@ class SmsActivate:
                         }
                     ) as response:
                         response.raise_for_status()
+                        resp_text = await response.text()
+                        raise_smsactivate_error(resp_text)
                         logging.debug(response.real_url)
-                        return await response.text()
+                        return resp_text
             except Exception as e:
                 last_exception = e
                 continue
