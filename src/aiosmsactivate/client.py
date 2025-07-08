@@ -1,13 +1,15 @@
+import asyncio
 import json
 import logging
 import re
+import time
 from typing import Literal
 
 import aiohttp
 
 from .utils import is_json
 from .exceptions import SmsActivateException
-from .responses import SetActivationStatusResponse
+from .models import ActivationData, Number, SetActivationStatusResponse, Sms
 from .types import SetActivationStatus, ActivationStatus
 
 __all__ = [
@@ -45,6 +47,40 @@ class SmsActivate:
     on git: https://github.com/AioSmsProviders/aiosmsactivate
     You can also write to the chat https://t.me/+5YQ8k6H02bkxZmRi
     or contact the main developer with ideas, suggestions, and bugs: https://t.me/lolkof
+    
+    SIMPLE USAGE
+    ```python
+    from aiosmsactivate import SmsActivate
+    from aiosmsactivate.types import SetActivationStatus
+
+    import asyncio
+
+
+    sa = SmsActivate('token')
+
+    async def main():
+        balance = await sa.get_balance()
+        print(balance) # 6.25
+        
+        number = await sa.purchase('ya')
+        number.activation_id # 3807035855
+        number.phone_number # '79238944456'
+        number.operator # 'mtt'
+        print(number)
+        # activation_id=3807035855 phone_number='79238944456' activation_cost=0.2 
+        # country_code='0' can_get_another_sms=True activation_time='2025-07-08 10:49:27' 
+        # operator='mtt' 
+        
+        code = await number.wait_sms_code(timeout=300)
+        print(code) # 1234
+        
+        status = await number.get_activation_status()
+        
+        await number.set_activation_status(SetActivationStatus.CANCEL) # Отменить номер || Cancel number
+        await number.set_activation_status(8) # Отменить номер || Cancel number
+        
+    asyncio.run(main())
+    ```
     """
 
     def __init__(self, api_key: str, base_url: str | list = allowed_domains):
@@ -169,15 +205,57 @@ class SmsActivate:
             case _:
                 raise SmsActivateException('Invalid response sequence')
     
-    async def get_activation_status(self, id: str) -> tuple[ActivationStatus, str | None] | dict:
+    async def get_activation_status(self, activation_id: str | int | Number) -> ActivationData | str:
+        if isinstance(activation_id, Number):
+            activation_id = activation_id.activation_id
         response = await self.__send_request('getStatusV2', params={
-            'id': id
+            'id': activation_id
         })
 
         if not is_json(response):
             return response
         
-        return json.loads(response)
+        return ActivationData(**json.loads(response))
+    
+    async def wait_sms_code(self, activation_id: str | int | Number, timeout: int = 60*5, per_attempt: int = 5) -> Sms | str | int | None:
+        """
+        Ожидание смс кода
+        Wait sms code
+
+        Аргументы:
+            activation_id: activation_id номера или целый объект номера
+            timeout: максимальное время ожидание смс в секундах, по умолчанию 5 минут 
+            per_attempt: время между попыткой получить смс, по умолчанию 5 секунд
+            
+        Args:
+            activation_id: activation_id of number or Number object
+            timeout: maximum time to wait sms code 
+            per_attempt: time per attempt
+            
+        Returns: Sms
+        """
+        activation_id = activation_id.activation_id if isinstance(activation_id, Number) else activation_id
+        if not self._api_key:
+            raise ValueError('API key is required for this method')
+
+        try:
+            await self.set_activation_status(activation_id=activation_id, status=SetActivationStatus.READY)
+        except:
+            pass
+
+        start_time = time.time()
+        
+        while time.time() - start_time < timeout:
+            await asyncio.sleep(per_attempt)
+            status, code = await self.get_activation_status_v1(activation_id)
+            if status == ActivationStatus.OK:
+                try:
+                    await self.set_activation_status(activation_id, SetActivationStatus.AGAIN)
+                except:
+                    pass
+                return code
+        
+        return None
 
     async def purchase(self, service: str, forward: bool | None = None, maxPrice: float | None = None,
                        phoneException: str | None = None, operator: str | None = None,
@@ -187,7 +265,7 @@ class SmsActivate:
                        useCashBack: bool | None = None,
                        orderId: str | int | None = None,
                        _is_v2: bool = True
-                       ) -> dict | str:
+                       ) -> Number | str:
         response = await self.__send_request('getNumber' if not _is_v2 else 'getNumberV2', params={
             'service': service,
             **({'forward': 1 if forward else 0} if forward is not None else {}),
@@ -206,7 +284,7 @@ class SmsActivate:
         if not is_json(response):
             return response
         
-        return json.loads(response)
+        return Number.from_response(self, json.loads(response))
     
     async def get_number(self, *args, **kwargs):
         kwargs["_is_v2"] = False
@@ -238,13 +316,12 @@ class SmsActivate:
         return json.loads(response)
     
 
-    async def set_activation_status(self, id: str, status: SetActivationStatus,
+    async def set_activation_status(self, activation_id: str | int, status: SetActivationStatus | int,
                                     forward: str | None = None) -> SetActivationStatusResponse:
         members = {member.value: member for member in SetActivationStatusResponse}
-
         response = await self.__send_request('setStatus', params={
-            'id': id,
-            'status': status.value,
+            'id': activation_id,
+            'status': status.value if isinstance(status, SetActivationStatus) else status,
             **({'forward': forward} if forward is not None else {})
         })
 

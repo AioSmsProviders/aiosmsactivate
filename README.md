@@ -13,30 +13,37 @@
 
 ## Getting Started
 
-### first steps (beta)
+### Simple usage
 
 ```python
 from aiosmsactivate import SmsActivate
+from aiosmsactivate.types import SetActivationStatus
 
 import asyncio
+
 
 sa = SmsActivate('token')
 
 async def main():
     balance = await sa.get_balance()
-    print(balance)
-    # 6.25
+    print(balance) # 6.25
     
     number = await sa.purchase('ya')
+    number.activation_id # 3807035855
+    number.phone_number # '79238944456'
+    number.operator # 'mtt'
     print(number)
-    # {'activationId': '3805286977', 'phoneNumber': '79148410549', 
-    # 'activationCost': 0.2, 'currency': 840, 'countryCode': '0', 
-    # 'canGetAnotherSms': True, 'activationTime': '2025-07-07 23:58:13', 
-    # 'activationEndTime': '2025-07-08 00:38:13', 'activationOperator': 'mts'}
+    # activation_id=3807035855 phone_number='79238944456' activation_cost=0.2 
+    # country_code='0' can_get_another_sms=True activation_time='2025-07-08 10:49:27' 
+    # operator='mtt' 
     
-    number = await sa.purchase_v1('ya')
-    print(number)
-    # ACCESS_NUMBER:3805353105:79146307636
+    code = await number.wait_sms_code(timeout=300)
+    print(code) # 1234
+    
+    status = await number.get_activation_status()
+    
+    await number.set_activation_status(SetActivationStatus.CANCEL) # Отменить номер || Cancel number
+    await number.set_activation_status(8) # Отменить номер || Cancel number
     
 asyncio.run(main())
 ```

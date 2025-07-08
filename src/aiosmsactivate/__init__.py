@@ -1,4 +1,4 @@
 from .client import SmsActivate
 from .exceptions import SmsActivateException
-from .responses import PurchaseResponse, SetActivationStatusResponse
+from .models import Number, SetActivationStatusResponse
 from .types import ActivationStatus, SetActivationStatus
