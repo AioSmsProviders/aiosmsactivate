@@ -70,9 +70,9 @@ class SmsActivate:
         number.phone_number # '79238944456'
         number.operator # 'mtt'
         print(number)
-        # activation_id=3807035855 phone_number='79238944456' activation_cost=0.2 
-        # country_code='0' can_get_another_sms=True activation_time='2025-07-08 10:49:27' 
-        # operator='mtt' 
+        # activation_id=3809954454 phone_number='79927146212' activation_cost=0.2 
+        # country_code='0' can_get_another_sms=True activation_time='2025-07-09 01:14:45' 
+        # operator='mtt' activation_unix_time=1654093857
         
         code = await number.wait_sms_code(timeout=300)
         print(code) # 1234
@@ -148,10 +148,10 @@ class SmsActivate:
     async def get_balance_and_cashback(self):
         return await self.get_balance(cashback=True)
 
-    async def get_available_countries(self, service: str, freePrice: bool | str) -> dict[str, Any]:
+    async def get_available_countries(self, service: str, freePrice: bool | str | None = None) -> dict[str, Any]:
         response = await self.__send_request('getTopCountriesByService', params={
             'service': service,
-            'freePrice': str(freePrice).lower()
+            **({'freePrice': str(freePrice).lower()} if freePrice else {})
         })
         
         if not is_json(response):
@@ -170,6 +170,7 @@ class SmsActivate:
         
         return json.loads(response)
     
+    @cached(cache)
     async def get_operators(self, country: str = None) -> dict[str, Any]:
         params = {}
         if country is not None:
@@ -374,7 +375,7 @@ class SmsActivate:
         
         return json.loads(response)
     
-    async def get_service(self, service_code: str, country: str | int, lang: Literal['ru', 'en', 'es', 'cn'] = 'en'):
+    async def get_service(self, service_code: str, country: str | int, lang: Literal['ru', 'en', 'es', 'cn'] = 'en') -> Service:
         """
         RU  
         Получить все данные о сервисе  
@@ -384,24 +385,34 @@ class SmsActivate:
         Example
         ```python
         service = await sa.get_service('ya', 0)
-        print(service) # code='ya' name='Yandex/Uber' country='0' cost=0.115 count=10794 physical_count=5075
+        print(service)
+        # code='ya' name='Yandex/Uber' country='0' 
+        # price=0.115 retail_price=0.2 free_price_map={'0.3067': 17134, '0.3065': 16996, ...} 
+        # count=11049 physical_count=5334
         ```
         """
         
         country = str(country)
         name = await self.get_service_name(service_code, lang)
         data = await self.get_prices(service_code, country)
+        price_data = await self.get_available_countries(service_code, freePrice=True)
+        price_data = price_data[country]
         
-        cost = data[country][service_code]['cost']
+        retail_price = price_data['retail_price']
+        free_price_map = price_data['freePriceMap']
+        
+        price = data[country][service_code]['cost']
         count = data[country][service_code]['count']
         physical_count = data[country][service_code]['physicalCount']
         return Service(
             code=service_code,
             country=country,
             name=name,
-            cost=cost,
+            price=price,
+            retail_price=retail_price,
             count=count,
             physical_count=physical_count,
+            free_price_map=free_price_map,
         )
     
     async def get_prices(self, 

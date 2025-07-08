@@ -1,4 +1,6 @@
+import datetime
 from enum import Enum
+import time
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
@@ -38,8 +40,14 @@ class Number(BaseModel):
     can_get_another_sms: bool = Field(alias='canGetAnotherSms')
     activation_time: str = Field(alias='activationTime')
     operator: str = Field(alias='activationOperator')
+    activation_unix_time: int | None = None
     
     _smsactivate_instance: Any = None
+    
+    def model_post_init(self, __context):
+        dt = datetime.datetime.strptime("2022-06-01 17:30:57", "%Y-%m-%d %H:%M:%S")
+        timestamp = time.mktime(dt.timetuple())
+        self.activation_unix_time = int(timestamp)
     
     @classmethod
     def from_response(cls, smsactivate_instance, data: dict):
@@ -62,6 +70,8 @@ class Service(BaseModel):
     code: str
     name: str
     country: str | int
-    cost: str | float
+    price: str | float
+    retail_price: float
+    free_price_map: dict
     count: str | int # physical + virtual numbers
     physical_count: str | int # physical numbers
