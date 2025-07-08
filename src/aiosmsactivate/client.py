@@ -10,7 +10,7 @@ import aiohttp
 
 from .utils import is_json
 from .exceptions import SmsActivateException, raise_smsactivate_error
-from .models import ActivationData, Number, SetActivationStatusResponse, Sms
+from .models import ActivationData, Number, Service, SetActivationStatusResponse, Sms
 from .types import SetActivationStatus, ActivationStatus
 
 cache = TTLCache(maxsize=100, ttl=3600)
@@ -374,9 +374,39 @@ class SmsActivate:
         
         return json.loads(response)
     
+    async def get_service(self, service_code: str, country: str | int, lang: Literal['ru', 'en', 'es', 'cn'] = 'en'):
+        """
+        RU  
+        Получить все данные о сервисе  
+        EN  
+        Get all data about service  
+        
+        Example
+        ```python
+        service = await sa.get_service('ya', 0)
+        print(service) # code='ya' name='Yandex/Uber' country='0' cost=0.115 count=10794 physical_count=5075
+        ```
+        """
+        
+        country = str(country)
+        name = await self.get_service_name(service_code, lang)
+        data = await self.get_prices(service_code, country)
+        
+        cost = data[country][service_code]['cost']
+        count = data[country][service_code]['count']
+        physical_count = data[country][service_code]['physicalCount']
+        return Service(
+            code=service_code,
+            country=country,
+            name=name,
+            cost=cost,
+            count=count,
+            physical_count=physical_count,
+        )
+    
     async def get_prices(self, 
                           service: str = None,
-                          country: str = None,
+                          country: str | int = None,
                        ) -> dict | list:
         response = await self.__send_request('getPrices', params={
             **({'service': str(service)} if service is not None else {}),
@@ -387,6 +417,14 @@ class SmsActivate:
             return response
         
         return json.loads(response)
+    
+    async def _get_service_cost(self, service: str, country: str | int):
+        data = await self.get_prices(service, country)
+        return data[country][service]['cost']
+    
+    async def _get_service_quantity(self, service: str, country: str | int):
+        data = await self.get_prices(service, country)
+        return data[country][service]['count']
     
     async def get_prices_verification(self, 
                           service: str = None,

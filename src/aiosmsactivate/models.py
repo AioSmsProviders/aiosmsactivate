@@ -56,3 +56,12 @@ class Number(BaseModel):
         
     async def get_activation_status(self) -> ActivationData | str:
         self._smsactivate_instance.get_activation_status(self.activation_id)
+        
+
+class Service(BaseModel):
+    code: str
+    name: str
+    country: str | int
+    cost: str | float
+    count: str | int # physical + virtual numbers
+    physical_count: str | int # physical numbers
