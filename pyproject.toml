@@ -10,7 +10,7 @@ name = "aiosmsactivate"
 version = "1.0.0"
 description = "Python asyncio wrapper for sms-activate.io API"
 readme = "README.md"
-authors = [{ name = "kewldan", email = "kewldanil1@gmail.com" }, { name = "lolkof", email = "lolkofprog@gmail.com" }]
+authors = [{ name = "lolkof", email = "lolkofprog@gmail.com" }, { name = "kewldan", email = "kewldanil1@gmail.com" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
