@@ -40,7 +40,17 @@ api_errors = {
     "INVALID_TIME": "Wrong time. The available number of hours is from 4 to 1344",
     "MAX_HOURS_EXCEED": "The maximum available time has been exceeded",
     "RENT_DIE": "The lease cannot be extended because the room's life has expired.",
-    "NO_YULA_MAIL": "The purchase of Mail Group activation services is available only to wholesale customers (starting from 1000 numbers per month) who have submitted an application and have been verified by the security service."
+    "NO_YULA_MAIL": "The purchase of Mail Group activation services is available only to wholesale customers (starting from 1000 numbers per month) who have submitted an application and have been verified by the security service.",
+    "NO_ACTIVATIONS": "No records found (no active activations)",
+    "INVALID_ACTIVATION_ID": "invalid activation id",
+    "OUT_OF_STOCK": "Out of numbers for this country",
+    "STATUS_FINISH": "Rent is paid and completed",
+    "STATUS_CANCEL": "Rent cancelled with a refund",
+    # "STATUS_WAIT_CODE": "Wait sms code",
+    "STATUS_REVOKE": "The number has been blocked, and your funds have been refunded.",
+    "BAD_DATA": "Incorrect id or id is not integer",
+    "INVALID_STATUS": "Incorrect status",
+    "INVALID_SIGNATURE": "Incorrect key",
 }
 
 
