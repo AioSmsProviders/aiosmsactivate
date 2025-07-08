@@ -40,7 +40,7 @@ class Number(BaseModel):
     can_get_another_sms: bool = Field(alias='canGetAnotherSms')
     activation_time: str = Field(alias='activationTime')
     operator: str = Field(alias='activationOperator')
-    activation_unix_time: int | None = None
+    activation_unix_time: float | None = None
     
     _smsactivate_instance: Any = None
     
