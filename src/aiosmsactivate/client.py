@@ -3,7 +3,7 @@ import json
 import logging
 import re
 import time
-from typing import Literal
+from typing import Any, Literal
 
 import aiohttp
 
@@ -145,7 +145,7 @@ class SmsActivate:
     async def get_balance_and_cashback(self):
         return await self.get_balance(cashback=True)
 
-    async def get_available_countries(self, service: str, freePrice: bool | str) -> dict[str, ...]:
+    async def get_available_countries(self, service: str, freePrice: bool | str) -> dict[str, Any]:
         response = await self.__send_request('getTopCountriesByService', params={
             'service': service,
             'freePrice': str(freePrice).lower()
@@ -156,7 +156,7 @@ class SmsActivate:
         
         return json.loads(response)
     
-    async def get_count_numbers(self, country: str, operator: str) -> dict[str, ...]:
+    async def get_count_numbers(self, country: str, operator: str) -> dict[str, Any]:
         response = await self.__send_request('getNumbersStatus', params={
             'country': country,
             'operator': operator
@@ -167,7 +167,7 @@ class SmsActivate:
         
         return json.loads(response)
     
-    async def get_operators(self, country: str = None) -> dict[str, ...]:
+    async def get_operators(self, country: str = None) -> dict[str, Any]:
         params = {}
         if country is not None:
             params["country"] = country
@@ -178,7 +178,7 @@ class SmsActivate:
         
         return json.loads(response)
     
-    async def get_active_activations(self) -> dict[str, ...]:
+    async def get_active_activations(self) -> dict[str, Any]:
         response = await self.__send_request('getActiveActivations')
         
         if not is_json(response):
