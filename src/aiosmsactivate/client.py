@@ -4,6 +4,7 @@ import logging
 import re
 import time
 from typing import Any, Literal
+from cachetools import TTLCache, cached
 
 import aiohttp
 
@@ -11,6 +12,8 @@ from .utils import is_json
 from .exceptions import SmsActivateException, raise_smsactivate_error
 from .models import ActivationData, Number, SetActivationStatusResponse, Sms
 from .types import SetActivationStatus, ActivationStatus
+
+cache = TTLCache(maxsize=100, ttl=3600)
 
 __all__ = [
     "SmsActivate",
@@ -107,9 +110,9 @@ class SmsActivate:
         for url in self._base_urls:
             try:
                 url = self._accept_url if self._accept_url else url
-                params = kwargs.get('params')
-                if params:
-                    kwargs.pop('params')
+                params = None
+                if 'params' in kwargs.keys():
+                    params = kwargs.pop('params')
                 async with aiohttp.ClientSession() as session:
                     async with session.request(
                         'POST',
@@ -407,6 +410,7 @@ class SmsActivate:
         
         return json.loads(response)
     
+    @cached(cache)
     async def get_service_list(self, 
                           country: str = None,
                           lang: Literal['ru', 'en', 'es', 'cn'] = None,
@@ -420,6 +424,25 @@ class SmsActivate:
             return response
         
         return json.loads(response)
+    
+    async def get_service_name(self, service_code: str, lang: Literal['ru', 'en', 'es', 'cn'] = None):
+        """
+        RU  
+        Получение полного имени сервиса по его id  
+          
+        EN  
+        Get full service name by service code  
+            
+        Пример Example:  
+        service_name = await SmsActivate.get_service_name('go')  
+        service_name # 'Google,youtube,Gmail'
+        """
+        services = await self.get_service_list(lang=lang)
+        services = services.get('services')
+        for service in services:
+            if service['code'] == service_code:
+                return service['name']
+        return None
     
     async def get_additional_service(self, 
                           service: str = None,
