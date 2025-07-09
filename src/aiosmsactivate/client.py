@@ -138,13 +138,13 @@ class SmsActivate:
         raise last_exception
 
     async def get_balance(self, cashback: bool = False) -> float:
-        pattern = re.compile(r'ACCESS_BALANCE:(\d+\.\d{2})')
         response = await self.__send_request('getBalance' if not cashback else 'getBalanceAndCashBack')
-        match = pattern.match(response)
-        if not match:
-            raise SmsActivateException('Invalid response sequence')
+        data = response.split(':')
+        if data[0] != 'ACCESS_BALANCE':
+            raise SmsActivateException(code='SmsActivateExcetion', message='Invalid response sequence')
 
-        return float(match.group(1))
+        return float(data[1])
+    
     async def get_balance_and_cashback(self):
         return await self.get_balance(cashback=True)
 
