@@ -516,16 +516,16 @@ class SmsActivate:
         return data
     
     async def get_extra_activation(self, 
-                          id: str = None,
+                          activationId: str = None,
                        ):
         """
         return 2 values: addition activation id and phone number
         
         use like this: 
-        activation_id, phone_number = await getExtraActivation(activation id)
+        activation_id, phone_number = await getExtraActivation(activation_id)
         """
         response = await self.__send_request('getExtraActivation', params={
-            'id':id
+            'id': activationId,
         })
 
         data = response.split(':')

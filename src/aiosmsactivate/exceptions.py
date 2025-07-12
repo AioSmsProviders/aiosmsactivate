@@ -69,6 +69,7 @@ def raise_smsactivate_error(response_text: str):
             error_code = resp_data.get('error') if not error_response_text else error_response_text
             error_message = error_code
             error_code = error_code.split(":")[0]
+        else: return
     else:
         error_code = error_response_text.split(":")[0]
         error_message = error_response_text
