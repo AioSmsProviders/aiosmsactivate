@@ -4,7 +4,7 @@ import logging
 import re
 import time
 from typing import Any, Literal
-from cachetools import TTLCache, cached
+from async_lru import alru_cache
 
 import aiohttp
 
@@ -12,8 +12,6 @@ from .utils import is_json
 from .exceptions import SmsActivateException, raise_smsactivate_error
 from .models import ActivationData, Number, Service, SetActivationStatusResponse, Sms
 from .types import SetActivationStatus, ActivationStatus
-
-cache = TTLCache(maxsize=100, ttl=3600)
 
 __all__ = [
     "SmsActivate",
@@ -170,7 +168,7 @@ class SmsActivate:
         
         return json.loads(response)
     
-    @cached(cache)
+    @alru_cache(maxsize=32)
     async def get_operators(self, country: str = None) -> dict[str, Any]:
         params = {}
         if country is not None:
@@ -461,7 +459,7 @@ class SmsActivate:
         
         return json.loads(response)
     
-    @cached(cache)
+    @alru_cache(maxsize=32)
     async def get_service_list(self, 
                           country: str = None,
                           lang: Literal['ru', 'en', 'es', 'cn'] = None,

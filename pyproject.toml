@@ -7,7 +7,7 @@ packages = ["src/aiosmsactivate"]
 
 [project]
 name = "aiosmsactivate"
-version = "1.4.2"
+version = "1.4.4"
 description = "Python asyncio wrapper for sms-activate.io API"
 readme = "README.md"
 authors = [{ name = "lolkof", email = "lolkofprog@gmail.com" }, { name = "kewldan", email = "kewldanil1@gmail.com" }]
@@ -20,7 +20,7 @@ classifiers = [
 keywords = ["sms", "api"]
 requires-python = ">=3.10"
 dependencies = [
-    "aiohttp", "pydantic", "cachetools"
+    "aiohttp", "pydantic", "async_lru"
 ]
 
 [project.urls]
