@@ -66,9 +66,12 @@ def raise_smsactivate_error(response_text: str):
         resp_data = json.loads(response_text)
         if resp_data.get('status') == 'error':
             error_response_text = resp_data.get('message')
-    
-    error_code = error_response_text.split(":")[0]
-    error_message = error_response_text
+            error_code = resp_data.get('error') if not error_response_text else error_response_text
+            error_message = error_code
+            error_code = error_code.split(":")[0]
+    else:
+        error_code = error_response_text.split(":")[0]
+        error_message = error_response_text
     
     if error_code in api_errors.keys():
         raise SmsActivateException(error_code, f'{error_message} - {api_errors[error_code]}')

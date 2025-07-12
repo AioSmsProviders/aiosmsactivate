@@ -168,7 +168,7 @@ class SmsActivate:
         
         return json.loads(response)
     
-    @alru_cache(maxsize=32)
+    @alru_cache(maxsize=32, ttl=3600*2)
     async def get_operators(self, country: str = None) -> dict[str, Any]:
         params = {}
         if country is not None:
@@ -459,7 +459,7 @@ class SmsActivate:
         
         return json.loads(response)
     
-    @alru_cache(maxsize=32)
+    @alru_cache(maxsize=32, ttl=3600*2)
     async def get_service_list(self, 
                           country: str = None,
                           lang: Literal['ru', 'en', 'es', 'cn'] = None,
