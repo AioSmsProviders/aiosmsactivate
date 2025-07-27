@@ -157,6 +157,21 @@ class SmsActivate:
         
         return json.loads(response)
     
+    async def get_available_countries_by_rank(self, service: str, freePrice: bool | str | None = None) -> dict[str, Any]:
+        """
+        in this method loyalty program rank is taken into account
+        """
+        
+        response = await self.__send_request('getTopCountriesByService', params={
+            'service': service,
+            **({'freePrice': str(freePrice).lower()} if freePrice else {})
+        })
+        
+        if not is_json(response):
+            return response
+        
+        return json.loads(response)
+    
     async def get_count_numbers(self, country: str, operator: str) -> dict[str, Any]:
         response = await self.__send_request('getNumbersStatus', params={
             'country': country,
@@ -261,7 +276,7 @@ class SmsActivate:
         
         return None
 
-    async def purchase(self, service: str, forward: bool | None = None, maxPrice: float | None = None,
+    async def purchase(self, service: str | Service, forward: bool | None = None, maxPrice: float | None = None,
                        phoneException: str | None = None, operator: str | None = None,
                        activationType: int | str | None = None, language: str | None = None,
                        userId: str | int | None = None,
@@ -270,6 +285,8 @@ class SmsActivate:
                        orderId: str | int | None = None,
                        _is_v2: bool = True
                        ) -> Number | str:
+        if isinstance(service, Service):
+            service = service.code
         response = await self.__send_request('getNumber' if not _is_v2 else 'getNumberV2', params={
             'service': service,
             **({'forward': 1 if forward else 0} if forward is not None else {}),
@@ -353,9 +370,13 @@ class SmsActivate:
     
     async def get_list_top_countries(self, 
                           service: str,
+                          length: str | int = 10,
+                          page: str | int = 1,
                        ) -> dict | list:
         response = await self.__send_request('getListOfTopCountriesByService', params={
-            'service': service
+            'service': service,
+            'length': length,
+            'page': page,
         })
 
         if not is_json(response):
@@ -375,7 +396,7 @@ class SmsActivate:
         
         return json.loads(response)
     
-    async def get_service(self, service_code: str, country: str | int, lang: Literal['ru', 'en', 'es', 'cn'] = 'en') -> Service:
+    async def get_service(self, service_code: str, country: str | int, lang: Literal['ru', 'en', 'es', 'cn'] = 'en', freePrice = False) -> Service:
         """
         RU  
         Получить все данные о сервисе  
@@ -394,7 +415,7 @@ class SmsActivate:
         
         country = str(country)
         name = await self.get_service_name(service_code, lang)
-        data = await self.get_prices(service_code, country)
+        data = await self.get_rank_prices(service_code, country, freePrice=freePrice)
         price_data = await self.get_available_countries(service_code, freePrice=True)
         price_data = price_data[country]
         
@@ -429,12 +450,28 @@ class SmsActivate:
         
         return json.loads(response)
     
+    async def get_rank_prices(self, 
+                          service: str = None,
+                          country: str | int = None,
+                          freePrice: bool | str = None,
+                       ) -> dict | list:
+        response = await self.__send_request('getPricesExtended', params={
+            **({'service': str(service)} if service is not None else {}),
+            **({'country': str(country)} if country is not None else {}),
+            **({'freePrice': str(freePrice)} if freePrice is not None else {}),
+        })
+
+        if not is_json(response):
+            return response
+        
+        return json.loads(response)
+    
     async def _get_service_cost(self, service: str, country: str | int):
-        data = await self.get_prices(service, country)
+        data = await self.get_rank_prices(service, country)
         return data[country][service]['cost']
     
     async def _get_service_quantity(self, service: str, country: str | int):
-        data = await self.get_prices(service, country)
+        data = await self.get_rank_prices(service, country)
         return data[country][service]['count']
     
     async def get_prices_verification(self, 
@@ -634,8 +671,14 @@ class SmsActivate:
         return json.loads(response)
     
     async def get_rent_list(self,
+                            id: str,
+                            page: int | str | None,
+                            size: int | str | None
                        ) -> dict | str:
         response = await self.__send_request('getRentList', params={
+            'id': id,
+            **({'page': str(page)} if page is not None else {}),
+            **({'size': str(size)} if size is not None else {}),
         })
 
         if not is_json(response):
@@ -657,7 +700,23 @@ class SmsActivate:
         
         return json.loads(response)
     
-    async def get_continue_rent_price_number(self,
+    async def continue_rent_info(self,
+                        id: str,
+                        hours: int | str | None,
+                        needHistory: bool | None,
+                       ) -> dict | str:
+        response = await self.__send_request('continueRentInfo', params={
+            'id': id,
+            'hours': str(hours)
+            **({'needHistory': str(needHistory)} if needHistory is not None else {}),
+        })
+
+        if not is_json(response):
+            return response
+        
+        return json.loads(response)
+    
+    async def get_continue_rent_price_number(self, # deprecated
                         id: str,
                         rent_time: int | str | None = 4,
                         currency: str | None = None
