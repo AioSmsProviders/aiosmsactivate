@@ -280,7 +280,7 @@ class SmsActivate:
                        phoneException: str | None = None, operator: str | None = None,
                        activationType: int | str | None = None, language: str | None = None,
                        userId: str | int | None = None,
-                       ref: str | None = None, country: str | None = None,
+                       ref: str | None = None, country: str | int | None = None,
                        useCashBack: bool | None = None,
                        orderId: str | int | None = None,
                        _is_v2: bool = True
@@ -298,7 +298,7 @@ class SmsActivate:
             **({'userId': str(userId)} if userId is not None else {}),
             **({'orderId': str(orderId)} if orderId is not None and _is_v2 else {}),
             **({'ref': ref} if ref is not None else {}),
-            **({'country ': country} if country is not None else {}),
+            **({'country': country} if country is not None else {}),
             **({'useCashBack': str(useCashBack).lower()} if useCashBack is not None else {}),
         })
 
